@@ -12,12 +12,12 @@ secrets:
 backend:
   replicaCount: 2
   image:
-    tag: "2f6dcdefffaa6d9ce984e9ecd9a09d3c13a1a42d"
+    tag: "344b8273e43dbc416d68df17a0ca8a22d0446ca1"
 
 frontend:
   replicaCount: 2
   image:
-    tag: "2f6dcdefffaa6d9ce984e9ecd9a09d3c13a1a42d"
+    tag: "344b8273e43dbc416d68df17a0ca8a22d0446ca1"
 
 ingress:
   frontendHost: staging.novashop.example.com
