@@ -1,0 +1,30 @@
+namespace:
+  create: false
+  name: novashop-staging
+
+config:
+  environment: staging
+  nextPublicApiUrl: https://api.staging.novashop.example.com
+
+secrets:
+  existingSecret: novashop-staging-secrets
+
+backend:
+  replicaCount: 2
+  image:
+    tag: "2f6dcdefffaa6d9ce984e9ecd9a09d3c13a1a42d"
+
+frontend:
+  replicaCount: 2
+  image:
+    tag: "2f6dcdefffaa6d9ce984e9ecd9a09d3c13a1a42d"
+
+ingress:
+  frontendHost: staging.novashop.example.com
+  backendHost: api.staging.novashop.example.com
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+  tls:
+    enabled: true
+    secretName: novashop-staging-tls

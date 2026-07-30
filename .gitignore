@@ -1,0 +1,14 @@
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.tmp
+*.bak
+*.orig
+*.log
+*.kubeconfig
+kubeconfig
+secrets/
+*.pem
+*.key

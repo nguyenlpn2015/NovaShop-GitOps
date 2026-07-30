@@ -1,0 +1,42 @@
+namespace:
+  create: false
+  name: novashop-development
+
+config:
+  environment: development
+  nextPublicApiUrl: http://api.dev.novashop.local
+
+secrets:
+  existingSecret: novashop-development-secrets
+
+backend:
+  replicaCount: 1
+  image:
+    tag: "2f6dcdefffaa6d9ce984e9ecd9a09d3c13a1a42d"
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 250m
+      memory: 256Mi
+
+frontend:
+  replicaCount: 1
+  image:
+    tag: "2f6dcdefffaa6d9ce984e9ecd9a09d3c13a1a42d"
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 250m
+      memory: 256Mi
+
+ingress:
+  frontendHost: dev.novashop.local
+  backendHost: api.dev.novashop.local
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+  tls:
+    enabled: false

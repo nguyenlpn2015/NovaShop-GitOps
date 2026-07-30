@@ -1,0 +1,81 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: novashop
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: novashop
+    app.kubernetes.io/component: gitops
+    app.kubernetes.io/part-of: novashop
+spec:
+  goTemplate: true
+  goTemplateOptions:
+    - missingkey=error
+  generators:
+    - list:
+        elements:
+          - environment: development
+            namespace: novashop-development
+            valuesFile: development.yaml
+          - environment: staging
+            namespace: novashop-staging
+            valuesFile: staging.yaml
+          - environment: production
+            namespace: novashop-production
+            valuesFile: production.yaml
+  template:
+    metadata:
+      name: "novashop-{{ .environment }}"
+      labels:
+        app.kubernetes.io/name: novashop
+        app.kubernetes.io/instance: "novashop-{{ .environment }}"
+        app.kubernetes.io/component: application
+        app.kubernetes.io/part-of: novashop
+        novashop.io/environment: "{{ .environment }}"
+      finalizers:
+        - resources-finalizer.argocd.argoproj.io
+    spec:
+      project: novashop
+      sources:
+        # The Helm chart is pinned; chart changes require a GitOps commit.
+        - repoURL: https://github.com/nguyenlpn2015/NovaShop.git
+          targetRevision: 1ae36ebcf059441decefe70446727747acafe8bf
+          path: helm/novashop
+          helm:
+            releaseName: novashop
+            valueFiles:
+              - "$values/apps/novashop/values/{{ .valuesFile }}"
+        - repoURL: https://github.com/nguyenlpn2015/NovaShop-GitOps.git
+          targetRevision: main
+          ref: values
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: "{{ .namespace }}"
+      syncPolicy:
+        automated:
+          enabled: true
+          prune: true
+          selfHeal: true
+          allowEmpty: false
+        syncOptions:
+          - ApplyOutOfSyncOnly=true
+          - CreateNamespace=true
+          - PruneLast=true
+          - PrunePropagationPolicy=foreground
+          - RespectIgnoreDifferences=true
+        managedNamespaceMetadata:
+          labels:
+            app.kubernetes.io/name: novashop
+            app.kubernetes.io/part-of: novashop
+            app.kubernetes.io/managed-by: argocd
+            novashop.io/environment: "{{ .environment }}"
+            pod-security.kubernetes.io/enforce: restricted
+            pod-security.kubernetes.io/audit: restricted
+            pod-security.kubernetes.io/warn: restricted
+        retry:
+          limit: 5
+          backoff:
+            duration: 5s
+            factor: 2
+            maxDuration: 3m
+      revisionHistoryLimit: 10

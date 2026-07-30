@@ -1,0 +1,5 @@
+# Protect deployment configuration with explicit platform review.
+* @nguyenlpn2015
+
+/clusters/ @nguyenlpn2015
+/apps/novashop/values/production.yaml @nguyenlpn2015
