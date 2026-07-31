@@ -27,6 +27,8 @@ exponential retry.
 | `novashop-development` | `development.yaml` |
 | `novashop-staging` | `staging.yaml` |
 | `novashop-production` | `production.yaml` |
+| `novashop-cert-manager` | Pinned cert-manager chart and ClusterIssuer |
+| `novashop-certificates` | Environment Certificate resources |
 
 Kubernetes workload probes and Argo CD resource health must both pass before an
 application is considered healthy.
@@ -55,9 +57,12 @@ request that either codifies or explicitly reverses the change.
 
 ## Secrets
 
-The referenced Kubernetes Secret for each environment must exist before the
-first application sync. Secret material is delivered by the platform and is
-not committed to this repository.
+The database and Redis Secret referenced by each environment must exist before
+the first workload becomes Ready. This runtime Secret is delivered by the
+platform and is not committed to this repository.
+
+TLS Secrets are generated and renewed by cert-manager from declarative
+`Certificate` resources. Do not create or edit their key material manually.
 
 ## Future Release Automation
 

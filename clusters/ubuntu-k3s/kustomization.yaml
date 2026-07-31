@@ -1,0 +1,32 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../base
+  - platform-project.yaml
+  - cert-manager-application.yaml
+  - certificates-application.yaml
+patches:
+  - target:
+      group: argoproj.io
+      version: v1alpha1
+      kind: ApplicationSet
+      name: novashop
+    patch: |-
+      - op: add
+        path: /metadata/annotations
+        value:
+          argocd.argoproj.io/sync-wave: "0"
+      - op: replace
+        path: /spec/template/spec/sources/0/helm/valueFiles
+        value:
+          - "$values/apps/novashop/values/{{ .valuesFile }}"
+          - "$values/apps/novashop/targets/ubuntu-k3s/{{ .valuesFile }}"
+      - op: add
+        path: /spec/template/spec/sources/-
+        value:
+          repoURL: https://github.com/nguyenlpn2015/NovaShop.git
+          targetRevision: b9a6a59702fac8e155aa69795bfa655b41266ed1
+          path: kubernetes/ingress/examples
+          directory:
+            recurse: false
+            include: "{{ .valuesFile }}"

@@ -1,0 +1,5 @@
+config:
+  nextPublicApiUrl: https://api.dev.novashop.smartdev.vn
+
+ingress:
+  enabled: false

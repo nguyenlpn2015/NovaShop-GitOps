@@ -15,13 +15,25 @@ NovaShop-GitOps/
 │   └── CODEOWNERS
 ├── apps/
 │   └── novashop/
-│       └── values/
-│           ├── development.yaml
-│           ├── staging.yaml
-│           └── production.yaml
+│       ├── values/
+│       │   ├── development.yaml
+│       │   ├── staging.yaml
+│       │   └── production.yaml
+│       └── targets/
+│           └── ubuntu-k3s/
+│               ├── development.yaml
+│               ├── staging.yaml
+│               └── production.yaml
 ├── clusters/
-│   └── in-cluster/
-│       └── novashop-applicationset.yaml
+│   ├── base/
+│   │   └── novashop-applicationset.yaml
+│   ├── in-cluster/
+│   │   └── kustomization.yaml
+│   └── ubuntu-k3s/
+│       ├── cert-manager-application.yaml
+│       ├── certificates-application.yaml
+│       ├── platform-project.yaml
+│       └── kustomization.yaml
 ├── docs/
 │   └── OPERATIONS.md
 ├── .gitignore
@@ -35,7 +47,9 @@ NovaShop-GitOps/
 - Shared defaults remain in the application Helm chart.
 - This repository stores only environment-specific overrides.
 - Development, staging, and production use isolated namespaces and Secrets.
-- Secret values are provisioned externally and are never stored in Git.
+- Runtime database and Redis Secret values are provisioned externally.
+- cert-manager generates and renews TLS Secrets; no private key is stored in
+  Git.
 - Every deployment and rollback is performed through a reviewed pull request.
 - CI may open deployment pull requests but may not write to the default branch.
 
@@ -43,15 +57,17 @@ NovaShop-GitOps/
 
 | Environment | Namespace | Values |
 |-------------|-----------|--------|
-| Development | `novashop-development` | `apps/novashop/values/development.yaml` |
-| Staging | `novashop-staging` | `apps/novashop/values/staging.yaml` |
-| Production | `novashop-production` | `apps/novashop/values/production.yaml` |
+| Development | `novashop-development` | `development.yaml` |
+| Staging | `novashop-staging` | `staging.yaml` |
+| Production | `novashop-production` | `production.yaml` |
 
 ## Reconciliation
 
-The in-cluster `ApplicationSet` generates one Argo CD `Application` per
-environment. Automatic sync, self-healing, pruning, bounded retry, and revision
-history are configured consistently for every environment.
+The shared `ApplicationSet` generates one Argo CD `Application` per
+environment. The `in-cluster` overlay preserves Docker Desktop local access.
+The `ubuntu-k3s` overlay adds public edge manifests, cert-manager, and automatic
+Let's Encrypt certificates. Automatic sync, self-healing, pruning, bounded
+retry, and revision history remain consistent.
 
 Operational deployment, synchronization, and rollback procedures are defined
 in [Operations](docs/OPERATIONS.md).
