@@ -30,9 +30,12 @@ NovaShop-GitOps/
 │   ├── in-cluster/
 │   │   └── kustomization.yaml
 │   └── ubuntu-k3s/
-│       ├── cert-manager-application.yaml
-│       ├── certificates-application.yaml
-│       ├── platform-project.yaml
+│       ├── phases/
+│       │   ├── http/
+│       │   └── tls/
+│       │       ├── cert-manager-application.yaml
+│       │       ├── certificates-application.yaml
+│       │       └── platform-project.yaml
 │       └── kustomization.yaml
 ├── docs/
 │   └── OPERATIONS.md
@@ -48,8 +51,9 @@ NovaShop-GitOps/
 - This repository stores only environment-specific overrides.
 - Development, staging, and production use isolated namespaces and Secrets.
 - Runtime database and Redis Secret values are provisioned externally.
-- cert-manager generates and renews TLS Secrets; no private key is stored in
-  Git.
+- Ubuntu bootstrap reconciles HTTP only and does not install cert-manager.
+- cert-manager and TLS are activated only by a separate reviewed GitOps change;
+  no private key is stored in Git.
 - Every deployment and rollback is performed through a reviewed pull request.
 - CI may open deployment pull requests but may not write to the default branch.
 
@@ -65,9 +69,11 @@ NovaShop-GitOps/
 
 The shared `ApplicationSet` generates one Argo CD `Application` per
 environment. The `in-cluster` overlay preserves Docker Desktop local access.
-The `ubuntu-k3s` overlay adds public edge manifests, cert-manager, and automatic
-Let's Encrypt certificates. Automatic sync, self-healing, pruning, bounded
-retry, and revision history remain consistent.
+The `ubuntu-k3s` overlay defaults to `phases/http`, which adds only public HTTP
+edge resources. `phases/tls` is repository-integrated but inactive; selecting
+it is an explicit platform change. Its first rollout uses Let's Encrypt staging
+before a separate production certificate promotion. Automatic sync,
+self-healing, pruning, bounded retry, and revision history remain consistent.
 
 Operational deployment, synchronization, and rollback procedures are defined
 in [Operations](docs/OPERATIONS.md).

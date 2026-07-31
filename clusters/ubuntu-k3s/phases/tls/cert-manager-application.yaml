@@ -1,25 +1,35 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: novashop-certificates
+  name: novashop-cert-manager
   namespace: argocd
   labels:
-    app.kubernetes.io/name: novashop-certificates
+    app.kubernetes.io/name: cert-manager
     app.kubernetes.io/component: certificate-management
     app.kubernetes.io/part-of: novashop
   annotations:
-    argocd.argoproj.io/sync-wave: "10"
+    argocd.argoproj.io/sync-wave: "-20"
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: novashop-platform
-  source:
-    repoURL: https://github.com/nguyenlpn2015/NovaShop.git
-    targetRevision: b9a6a59702fac8e155aa69795bfa655b41266ed1
-    path: kubernetes/cert-manager
-    directory:
-      recurse: false
-      include: certificate.yaml
+  sources:
+    - repoURL: quay.io/jetstack/charts
+      chart: cert-manager
+      targetRevision: v1.21.0
+      helm:
+        releaseName: cert-manager
+        valueFiles:
+          - $values/kubernetes/cert-manager/helm-values.yaml
+    - repoURL: https://github.com/nguyenlpn2015/NovaShop.git
+      targetRevision: 54a68eda594ec268da91ce8d3c480b1155194dc3
+      ref: values
+    - repoURL: https://github.com/nguyenlpn2015/NovaShop.git
+      targetRevision: 54a68eda594ec268da91ce8d3c480b1155194dc3
+      path: kubernetes/cert-manager
+      directory:
+        recurse: false
+        include: "{namespace.yaml,clusterissuer.yaml}"
   destination:
     server: https://kubernetes.default.svc
     namespace: cert-manager
@@ -31,6 +41,7 @@ spec:
       allowEmpty: false
     syncOptions:
       - ApplyOutOfSyncOnly=true
+      - CreateNamespace=true
       - PruneLast=true
       - RespectIgnoreDifferences=true
       - ServerSideApply=true
