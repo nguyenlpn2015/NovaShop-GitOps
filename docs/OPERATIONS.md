@@ -77,8 +77,9 @@ issuer. Bootstrap must never change this selection.
 4. Verify ACME staging issuance, HTTPS routing, renewal metadata, and rollback.
 5. Promote the Certificate Application to `certificate.yaml` through a second
    reviewed pull request.
-6. Verify the production chain without `--insecure` before enabling redirects
-   and HSTS in a final edge-enforcement pull request.
+6. Verify the production chain without `--insecure`.
+7. Promote the reviewed edge-enforcement commit to enable redirects and HSTS.
+8. Verify exact redirect locations, trusted HTTPS, HSTS, and backend health.
 
 Rollback is a Git revert that restores `phases/http`; no imperative Helm or
 `kubectl apply` command is part of activation or rollback.

@@ -15,7 +15,7 @@ spec:
   project: novashop-platform
   source:
     repoURL: https://github.com/nguyenlpn2015/NovaShop.git
-    targetRevision: 54a68eda594ec268da91ce8d3c480b1155194dc3
+    targetRevision: c2a3db20bfbfc8d7aa790a751842158359f3f155
     path: kubernetes/cert-manager
     directory:
       recurse: false

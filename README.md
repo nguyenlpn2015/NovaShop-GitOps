@@ -69,10 +69,9 @@ NovaShop-GitOps/
 
 The shared `ApplicationSet` generates one Argo CD `Application` per
 environment. The `in-cluster` overlay preserves Docker Desktop local access.
-The `ubuntu-k3s` overlay selects `phases/tls`. ACME staging validation has
-completed, and Certificate resources now use Let's Encrypt production. HTTP
-remains available while production trust is verified; redirect and HSTS remain
-disabled until a separate reviewed edge-enforcement change. Automatic sync,
+The `ubuntu-k3s` overlay selects `phases/tls`. Certificate resources use Let's
+Encrypt production, HTTP permanently redirects to HTTPS, and HTTPS responses
+enforce HSTS and the approved security-header policy. Automatic sync,
 self-healing, pruning, bounded retry, and revision history remain consistent.
 
 Operational deployment, synchronization, and rollback procedures are defined
