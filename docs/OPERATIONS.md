@@ -27,6 +27,8 @@ exponential retry.
 | `novashop-development` | `development.yaml` |
 | `novashop-staging` | `staging.yaml` |
 | `novashop-production` | `production.yaml` |
+| `novashop-cert-manager` | TLS phase only: pinned chart and ClusterIssuers |
+| `novashop-certificates` | TLS phase only: environment Certificate resources |
 
 Kubernetes workload probes and Argo CD resource health must both pass before an
 application is considered healthy.
@@ -55,9 +57,29 @@ request that either codifies or explicitly reverses the change.
 
 ## Secrets
 
-The referenced Kubernetes Secret for each environment must exist before the
-first application sync. Secret material is delivered by the platform and is
-not committed to this repository.
+The database and Redis Secret referenced by each environment must exist before
+the first workload becomes Ready. This runtime Secret is delivered by the
+platform and is not committed to this repository.
+
+TLS Secrets are absent in the default HTTP phase. After a reviewed TLS
+activation, they are generated and renewed by cert-manager from declarative
+`Certificate` resources. Do not create or edit their key material manually.
+
+## TLS Activation
+
+The root `clusters/ubuntu-k3s/kustomization.yaml` references `phases/http` by
+default. Bootstrap must never change this selection.
+
+1. Validate public HTTP routing and health.
+2. Open a GitOps pull request changing the resource to `phases/tls`.
+3. Keep `certificate-staging.yaml` selected.
+4. Merge and verify ACME staging issuance and rollback.
+5. Open a second pull request changing the Certificate Application include to
+   `certificate.yaml`.
+6. Merge and verify the production chain before enabling redirects and HSTS.
+
+Rollback is a Git revert that restores `phases/http`; no imperative Helm or
+`kubectl apply` command is part of activation or rollback.
 
 ## Future Release Automation
 
