@@ -67,13 +67,14 @@ activation, they are generated and renewed by cert-manager from declarative
 
 ## TLS Activation
 
-The root `clusters/ubuntu-k3s/kustomization.yaml` references `phases/http` by
-default. Bootstrap must never change this selection.
+The root `clusters/ubuntu-k3s/kustomization.yaml` selects `phases/tls` during
+the controlled staging-certificate rollout. Bootstrap must never change this
+selection.
 
 1. Validate public HTTP routing and health.
-2. Open a GitOps pull request changing the resource to `phases/tls`.
-3. Keep `certificate-staging.yaml` selected.
-4. Merge and verify ACME staging issuance and rollback.
+2. Select `phases/tls` through a reviewed GitOps pull request.
+3. Keep `certificate-staging.yaml` selected and HTTP routing available.
+4. Verify ACME staging issuance, HTTPS routing, renewal metadata, and rollback.
 5. Open a second pull request changing the Certificate Application include to
    `certificate.yaml`.
 6. Merge and verify the production chain before enabling redirects and HSTS.
