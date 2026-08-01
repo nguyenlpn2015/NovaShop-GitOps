@@ -1,0 +1,29 @@
+name: Validation
+
+# Every pull request against the desired state runs the same validation engine
+# that gates the NovaShop application repository: yamllint, kustomize builds of
+# every cluster overlay and phase, Helm lint and template per environment,
+# Kubernetes and CRD schema validation, and cross-repository revision
+# durability. One definition of correctness governs both repositories.
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gitops-validation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Validate
+    uses: nguyenlpn2015/NovaShop/.github/workflows/validation.yml@main
+    permissions:
+      contents: read
+    with:
+      caller: gitops
+      app-ref: main

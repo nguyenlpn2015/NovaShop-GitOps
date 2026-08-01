@@ -1,6 +1,8 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  # TLS staging keeps HTTP available while validating ACME issuance.
-  # Production certificates, redirects, and HSTS require a separate promotion.
-  - phases/tls
+  # Production runs the enforced edge: HTTPS required, HTTP redirects, HSTS on.
+  # Rollback is a reviewed revert of this line to phases/tls-baseline, which
+  # keeps certificates and HTTPS while releasing enforcement. phases/http is
+  # break-glass only; it prunes the certificates.
+  - phases/tls-enforced

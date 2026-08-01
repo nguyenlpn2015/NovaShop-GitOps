@@ -31,11 +31,12 @@ NovaShop-GitOps/
 │   │   └── kustomization.yaml
 │   └── ubuntu-k3s/
 │       ├── phases/
-│       │   ├── http/
-│       │   └── tls/
-│       │       ├── cert-manager-application.yaml
-│       │       ├── certificates-application.yaml
-│       │       └── platform-project.yaml
+│       │   ├── http/           break-glass only; prunes certificates
+│       │   ├── tls-baseline/   rollback target; HTTPS kept, HSTS released
+│       │   │   ├── cert-manager-application.yaml
+│       │   │   ├── certificates-application.yaml
+│       │   │   └── platform-project.yaml
+│       │   └── tls-enforced/   production; redirect and HSTS
 │       └── kustomization.yaml
 ├── docs/
 │   └── OPERATIONS.md
@@ -69,10 +70,15 @@ NovaShop-GitOps/
 
 The shared `ApplicationSet` generates one Argo CD `Application` per
 environment. The `in-cluster` overlay preserves Docker Desktop local access.
-The `ubuntu-k3s` overlay selects `phases/tls`. Certificate resources use Let's
-Encrypt production, HTTP permanently redirects to HTTPS, and HTTPS responses
-enforce HSTS and the approved security-header policy. Automatic sync,
+The `ubuntu-k3s` overlay selects `phases/tls-enforced`. Certificate resources
+use Let's Encrypt production, HTTP permanently redirects to HTTPS, and HTTPS
+responses enforce HSTS and the approved security-header policy. Automatic sync,
 self-healing, pruning, bounded retry, and revision history remain consistent.
+
+Rollback targets `phases/tls-baseline`, which keeps cert-manager, the
+certificates, and HTTPS while releasing enforcement. Every pull request here is
+validated by the same engine that gates the application repository; see
+[Operations](docs/OPERATIONS.md).
 
 Operational deployment, synchronization, and rollback procedures are defined
 in [Operations](docs/OPERATIONS.md).

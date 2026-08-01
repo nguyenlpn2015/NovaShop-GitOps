@@ -65,24 +65,37 @@ TLS Secrets are absent in the default HTTP phase. After a reviewed TLS
 activation, they are generated and renewed by cert-manager from declarative
 `Certificate` resources. Do not create or edit their key material manually.
 
-## TLS Activation
+## Edge Phases
 
-The root `clusters/ubuntu-k3s/kustomization.yaml` selects `phases/tls`.
-Staging validation is complete and `certificate.yaml` selects the production
-issuer. Bootstrap must never change this selection.
+The root `clusters/ubuntu-k3s/kustomization.yaml` selects exactly one phase.
+Bootstrap observes that selection and never changes it.
 
-1. Validate public HTTP routing and health.
-2. Select `phases/tls` through a reviewed GitOps pull request.
-3. Keep `certificate-staging.yaml` selected and HTTP routing available.
-4. Verify ACME staging issuance, HTTPS routing, renewal metadata, and rollback.
-5. Promote the Certificate Application to `certificate.yaml` through a second
-   reviewed pull request.
-6. Verify the production chain without `--insecure`.
-7. Promote the reviewed edge-enforcement commit to enable redirects and HSTS.
-8. Verify exact redirect locations, trusted HTTPS, HSTS, and backend health.
+| Phase | Certificates | HTTP | HSTS | Role |
+|-------|--------------|------|------|------|
+| `phases/tls-enforced` | issued | redirects to HTTPS | `max-age=31536000` | Production |
+| `phases/tls-baseline` | issued | answers directly | `max-age=0` | **Rollback target** |
+| `phases/http` | **pruned** | answers directly | absent | Break-glass only |
 
-Rollback is a Git revert that restores `phases/http`; no imperative Helm or
-`kubectl apply` command is part of activation or rollback.
+Each phase differs from the one above it by a single concern, so a change of
+phase is a one-line reviewed revert of the root kustomization.
+
+## Rollback Ladder
+
+Roll back to `phases/tls-baseline`. cert-manager, the `Certificate` resources,
+and HTTPS all remain in place; only enforcement is released, and
+`Strict-Transport-Security: max-age=0` actively clears the pin that browsers
+were given. No certificate is pruned and no issuance quota is consumed.
+
+`phases/http` is not a rollback target. It removes the certificate resources
+from the desired state, and with `prune: true` Argo CD deletes them. Because
+production advertises HSTS with a one-year `max-age`, returning browsers would
+refuse plaintext outright rather than degrade. Let's Encrypt permits five
+duplicate certificates per identical hostname set per 168 hours, so recovering
+from that choice can take a week. Use it only after browsers have already
+observed `max-age=0` from the baseline phase, and only with a certificate backup
+taken beforehand.
+
+No imperative Helm or `kubectl apply` command is part of any phase change.
 
 ## Future Release Automation
 
