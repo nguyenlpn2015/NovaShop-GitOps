@@ -39,7 +39,7 @@ spec:
       sources:
         # The Helm chart is pinned; chart changes require a GitOps commit.
         - repoURL: https://github.com/nguyenlpn2015/NovaShop.git
-          targetRevision: 87d958dea16201ed42cecb1c67895355836ff7d2
+          targetRevision: e4c901f3948d2e156e1b21b55b310684932724a0
           path: helm/novashop
           helm:
             releaseName: novashop

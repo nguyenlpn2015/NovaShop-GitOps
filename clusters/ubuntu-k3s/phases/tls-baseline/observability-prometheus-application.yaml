@@ -32,10 +32,10 @@ spec:
           - $values/kubernetes/observability/prometheus/helm-values.yaml
           - $values/kubernetes/observability/prometheus/alerting-values.yaml
     - repoURL: https://github.com/nguyenlpn2015/NovaShop.git
-      targetRevision: 87d958dea16201ed42cecb1c67895355836ff7d2
+      targetRevision: e4c901f3948d2e156e1b21b55b310684932724a0
       ref: values
     - repoURL: https://github.com/nguyenlpn2015/NovaShop.git
-      targetRevision: 87d958dea16201ed42cecb1c67895355836ff7d2
+      targetRevision: e4c901f3948d2e156e1b21b55b310684932724a0
       path: kubernetes/observability
       directory:
         recurse: false
@@ -62,28 +62,23 @@ spec:
         factor: 2
         maxDuration: 5m
   ignoreDifferences:
+    # An entry ignoring /spec/minReadySeconds on the Alertmanager StatefulSet was
+    # removed from this list. It had no effect, and claiming otherwise was worse
+    # than not having it: the normalizer removes the path from the live state,
+    # where it is already absent, so nothing changes and the target keeps the
+    # field. Anyone finding this Application OutOfSync would have read the entry
+    # and ruled out the actual cause.
+    #
+    # The fix lives in the chart values instead — the field is set to a non-zero
+    # value so it survives a round trip through the API. See the comment on
+    # minReadySeconds in kubernetes/observability/prometheus/alerting-values.yaml
+    # and the fourth failure mode in
+    # docs/observability/runbooks/argo-sync-failed.md.
+    #
     # The chart does not template a storage request that local-path then binds
     # and reports back. Reconciling it would fight the provisioner forever.
     - group: ""
       kind: PersistentVolumeClaim
       jsonPointers:
         - /spec/volumeName
-    # The Alertmanager StatefulSet renders `minReadySeconds: 0`. Zero is the API
-    # default for that field, so the API server stores nothing and reads it back
-    # absent. Argo CD then compares a desired field against a live object that
-    # does not have it and reports OutOfSync permanently: the sync itself
-    # succeeds, self-heal reapplies, and the difference survives every attempt.
-    #
-    # The chart does expose alertmanager.minReadySeconds, so setting it to any
-    # non-zero value would also make the diff disappear. That was rejected —
-    # changing how long a pod must stay ready before counting as available, in
-    # order to satisfy a diff engine, would be a runtime change made for a
-    # reason that has nothing to do with runtime.
-    #
-    # Ignoring the field states what is actually true: both sides are zero.
-    - group: apps
-      kind: StatefulSet
-      name: novashop-prometheus-alertmanager
-      jsonPointers:
-        - /spec/minReadySeconds
   revisionHistoryLimit: 10
