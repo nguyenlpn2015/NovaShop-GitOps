@@ -15,6 +15,8 @@ spec:
   description: Cluster-scoped platform services for NovaShop Ubuntu k3s
   sourceRepos:
     - quay.io/jetstack/charts
+    - https://prometheus-community.github.io/helm-charts
+    - https://grafana.github.io/helm-charts
     - https://github.com/nguyenlpn2015/NovaShop.git
   destinations:
     - server: https://kubernetes.default.svc
@@ -27,6 +29,8 @@ spec:
       namespace: novashop-staging
     - server: https://kubernetes.default.svc
       namespace: novashop-production
+    - server: https://kubernetes.default.svc
+      namespace: observability
   clusterResourceWhitelist:
     - group: ""
       kind: Namespace
@@ -54,9 +58,13 @@ spec:
     - group: ""
       kind: ServiceAccount
     - group: apps
+      kind: DaemonSet
+    - group: apps
       kind: Deployment
     - group: batch
       kind: Job
+    - group: ""
+      kind: PersistentVolumeClaim
     - group: cert-manager.io
       kind: Certificate
     - group: cert-manager.io
