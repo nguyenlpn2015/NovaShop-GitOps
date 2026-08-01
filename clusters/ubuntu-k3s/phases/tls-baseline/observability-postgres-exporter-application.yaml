@@ -1,37 +1,30 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: novashop-prometheus
+  name: novashop-postgres-exporter
   namespace: argocd
   labels:
-    app.kubernetes.io/name: prometheus
+    app.kubernetes.io/name: postgres-exporter
     app.kubernetes.io/component: observability
     app.kubernetes.io/part-of: novashop
   annotations:
-    # Ahead of the workloads it observes, so a scrape target that appears during
-    # a rollout is collected from its first moment rather than after it settles.
-    argocd.argoproj.io/sync-wave: "-15"
+    # After Prometheus, which must exist to collect what this produces.
+    argocd.argoproj.io/sync-wave: "-13"
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: novashop-platform
   sources:
     - repoURL: https://prometheus-community.github.io/helm-charts
-      chart: prometheus
-      targetRevision: 29.20.1
+      chart: prometheus-postgres-exporter
+      targetRevision: 8.2.0
       helm:
-        releaseName: novashop-prometheus
+        releaseName: novashop-postgres-exporter
         valueFiles:
-          - $values/kubernetes/observability/prometheus/helm-values.yaml
+          - $values/kubernetes/observability/postgres-exporter/helm-values.yaml
     - repoURL: https://github.com/nguyenlpn2015/NovaShop.git
       targetRevision: 633c2c41164dec89284b29706cf8c4d0f02de0cb
       ref: values
-    - repoURL: https://github.com/nguyenlpn2015/NovaShop.git
-      targetRevision: 633c2c41164dec89284b29706cf8c4d0f02de0cb
-      path: kubernetes/observability
-      directory:
-        recurse: false
-        include: namespace.yaml
   destination:
     server: https://kubernetes.default.svc
     namespace: observability
@@ -53,11 +46,4 @@ spec:
         duration: 10s
         factor: 2
         maxDuration: 5m
-  ignoreDifferences:
-    # The chart does not template a storage request that local-path then binds
-    # and reports back. Reconciling it would fight the provisioner forever.
-    - group: ""
-      kind: PersistentVolumeClaim
-      jsonPointers:
-        - /spec/volumeName
   revisionHistoryLimit: 10
