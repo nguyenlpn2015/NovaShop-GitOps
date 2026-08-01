@@ -62,20 +62,23 @@ spec:
         factor: 2
         maxDuration: 5m
   ignoreDifferences:
+    # An entry ignoring /spec/minReadySeconds on the Alertmanager StatefulSet was
+    # removed from this list. It had no effect, and claiming otherwise was worse
+    # than not having it: the normalizer removes the path from the live state,
+    # where it is already absent, so nothing changes and the target keeps the
+    # field. Anyone finding this Application OutOfSync would have read the entry
+    # and ruled out the actual cause.
+    #
+    # The fix lives in the chart values instead — the field is set to a non-zero
+    # value so it survives a round trip through the API. See the comment on
+    # minReadySeconds in kubernetes/observability/prometheus/alerting-values.yaml
+    # and the fourth failure mode in
+    # docs/observability/runbooks/argo-sync-failed.md.
+    #
     # The chart does not template a storage request that local-path then binds
     # and reports back. Reconciling it would fight the provisioner forever.
     - group: ""
       kind: PersistentVolumeClaim
       jsonPointers:
         - /spec/volumeName
-    # An entry ignoring /spec/minReadySeconds on the Alertmanager StatefulSet was
-    # removed from here. It had no effect and claiming otherwise was worse than
-    # not having it: the normalizer removes the path from the live state, where it
-    # is already absent, so nothing changes and the target keeps the field.
-    #
-    # The fix lives in the chart values instead — the field is set to a non-zero
-    # value so it survives a round trip through the API. See the comment on
-    # minReadySeconds in kubernetes/observability/prometheus/alerting-values.yaml,
-    # and the fourth failure mode in
-    # docs/observability/runbooks/argo-sync-failed.md.
   revisionHistoryLimit: 10
