@@ -23,7 +23,7 @@ spec:
         valueFiles:
           - $values/kubernetes/observability/alloy/helm-values.yaml
     - repoURL: https://github.com/nguyenlpn2015/NovaShop.git
-      targetRevision: 68a27fc8d21ea19cde615a34cf20687d98c3ac9b
+      targetRevision: b9405fe14a0b2e619b791e15cfb3d668366d07eb
       ref: values
   destination:
     server: https://kubernetes.default.svc

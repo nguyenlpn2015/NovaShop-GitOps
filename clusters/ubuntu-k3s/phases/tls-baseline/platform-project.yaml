@@ -61,6 +61,12 @@ spec:
       kind: DaemonSet
     - group: apps
       kind: Deployment
+    # Loki runs as a single-binary StatefulSet. Omitting this is why
+    # novashop-loki sat OutOfSync/Missing: Argo CD enforces this whitelist at
+    # sync time, so the manifest rendered and validated cleanly and was refused
+    # only after merge.
+    - group: apps
+      kind: StatefulSet
     - group: batch
       kind: Job
     - group: ""
