@@ -68,4 +68,22 @@ spec:
       kind: PersistentVolumeClaim
       jsonPointers:
         - /spec/volumeName
+    # The Alertmanager StatefulSet renders `minReadySeconds: 0`. Zero is the API
+    # default for that field, so the API server stores nothing and reads it back
+    # absent. Argo CD then compares a desired field against a live object that
+    # does not have it and reports OutOfSync permanently: the sync itself
+    # succeeds, self-heal reapplies, and the difference survives every attempt.
+    #
+    # The chart does expose alertmanager.minReadySeconds, so setting it to any
+    # non-zero value would also make the diff disappear. That was rejected —
+    # changing how long a pod must stay ready before counting as available, in
+    # order to satisfy a diff engine, would be a runtime change made for a
+    # reason that has nothing to do with runtime.
+    #
+    # Ignoring the field states what is actually true: both sides are zero.
+    - group: apps
+      kind: StatefulSet
+      name: novashop-prometheus-alertmanager
+      jsonPointers:
+        - /spec/minReadySeconds
   revisionHistoryLimit: 10
