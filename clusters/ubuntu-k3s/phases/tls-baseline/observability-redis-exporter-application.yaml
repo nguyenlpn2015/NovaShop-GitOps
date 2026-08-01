@@ -22,7 +22,7 @@ spec:
         valueFiles:
           - $values/kubernetes/observability/redis-exporter/helm-values.yaml
     - repoURL: https://github.com/nguyenlpn2015/NovaShop.git
-      targetRevision: 1b1b1ce9667764146a380efc5d15efdf1e656d38
+      targetRevision: 87d958dea16201ed42cecb1c67895355836ff7d2
       ref: values
   destination:
     server: https://kubernetes.default.svc
