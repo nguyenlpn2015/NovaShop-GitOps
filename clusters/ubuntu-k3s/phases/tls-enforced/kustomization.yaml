@@ -1,0 +1,21 @@
+# TLS enforced: the production edge. HTTP permanently redirects to HTTPS and
+# HSTS is advertised with a one-year max-age.
+#
+# This phase is tls-baseline plus enforcement and nothing else: the only delta
+# is the edge manifest directory. Rolling back is a one-line reviewed revert of
+# the root kustomization to phases/tls-baseline, which keeps every certificate
+# and clears the HSTS pin. The HTTP-only phase remains break-glass only.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../tls-baseline
+patches:
+  - target:
+      group: argoproj.io
+      version: v1alpha1
+      kind: ApplicationSet
+      name: novashop
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/sources/2/path
+        value: kubernetes/ingress/examples

@@ -1,0 +1,25 @@
+# TLS baseline: certificates are issued and HTTPS is served, but HTTP still
+# answers directly and Strict-Transport-Security is released with max-age=0.
+#
+# This phase is the ROLLBACK TARGET for the enforced production edge. Reverting
+# to it never removes cert-manager or the Certificate resources, so a rollback
+# neither prunes certificate Secrets nor consumes Let's Encrypt issuance quota,
+# and browsers holding the one-year HSTS pin are actively released instead of
+# being stranded against a plaintext origin.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../http
+  - platform-project.yaml
+  - cert-manager-application.yaml
+  - certificates-application.yaml
+patches:
+  - target:
+      group: argoproj.io
+      version: v1alpha1
+      kind: ApplicationSet
+      name: novashop
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/sources/2/path
+        value: kubernetes/ingress/baseline
