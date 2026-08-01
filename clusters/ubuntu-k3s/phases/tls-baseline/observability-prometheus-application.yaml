@@ -1,38 +1,40 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: novashop-cert-manager
+  name: novashop-prometheus
   namespace: argocd
   labels:
-    app.kubernetes.io/name: cert-manager
-    app.kubernetes.io/component: certificate-management
+    app.kubernetes.io/name: prometheus
+    app.kubernetes.io/component: observability
     app.kubernetes.io/part-of: novashop
   annotations:
-    argocd.argoproj.io/sync-wave: "-20"
+    # Ahead of the workloads it observes, so a scrape target that appears during
+    # a rollout is collected from its first moment rather than after it settles.
+    argocd.argoproj.io/sync-wave: "-15"
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: novashop-platform
   sources:
-    - repoURL: quay.io/jetstack/charts
-      chart: cert-manager
-      targetRevision: v1.21.0
+    - repoURL: https://prometheus-community.github.io/helm-charts
+      chart: prometheus
+      targetRevision: 29.20.1
       helm:
-        releaseName: cert-manager
+        releaseName: novashop-prometheus
         valueFiles:
-          - $values/kubernetes/cert-manager/helm-values.yaml
+          - $values/kubernetes/observability/prometheus/helm-values.yaml
     - repoURL: https://github.com/nguyenlpn2015/NovaShop.git
       targetRevision: 10bcb6cf53cdc2396f646ecc5ea408e53dce6a4a
       ref: values
     - repoURL: https://github.com/nguyenlpn2015/NovaShop.git
       targetRevision: 10bcb6cf53cdc2396f646ecc5ea408e53dce6a4a
-      path: kubernetes/cert-manager
+      path: kubernetes/observability
       directory:
         recurse: false
-        include: "{namespace.yaml,clusterissuer.yaml}"
+        include: namespace.yaml
   destination:
     server: https://kubernetes.default.svc
-    namespace: cert-manager
+    namespace: observability
   syncPolicy:
     automated:
       enabled: true
@@ -45,11 +47,17 @@ spec:
       - PruneLast=true
       - RespectIgnoreDifferences=true
       - ServerSideApply=true
-      - SkipDryRunOnMissingResource=true
     retry:
       limit: 10
       backoff:
         duration: 10s
         factor: 2
         maxDuration: 5m
+  ignoreDifferences:
+    # The chart does not template a storage request that local-path then binds
+    # and reports back. Reconciling it would fight the provisioner forever.
+    - group: ""
+      kind: PersistentVolumeClaim
+      jsonPointers:
+        - /spec/volumeName
   revisionHistoryLimit: 10

@@ -13,6 +13,8 @@ resources:
   - platform-project.yaml
   - cert-manager-application.yaml
   - certificates-application.yaml
+  - observability-prometheus-application.yaml
+  - observability-grafana-application.yaml
 patches:
   - target:
       group: argoproj.io
