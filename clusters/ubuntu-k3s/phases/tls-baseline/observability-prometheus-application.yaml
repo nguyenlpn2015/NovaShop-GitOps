@@ -62,23 +62,38 @@ spec:
         factor: 2
         maxDuration: 5m
   ignoreDifferences:
-    # An entry ignoring /spec/minReadySeconds on the Alertmanager StatefulSet was
-    # removed from this list. It had no effect, and claiming otherwise was worse
-    # than not having it: the normalizer removes the path from the live state,
-    # where it is already absent, so nothing changes and the target keeps the
-    # field. Anyone finding this Application OutOfSync would have read the entry
-    # and ruled out the actual cause.
-    #
-    # The fix lives in the chart values instead — the field is set to a non-zero
-    # value so it survives a round trip through the API. See the comment on
-    # minReadySeconds in kubernetes/observability/prometheus/alerting-values.yaml
-    # and the fourth failure mode in
-    # docs/observability/runbooks/argo-sync-failed.md.
-    #
     # The chart does not template a storage request that local-path then binds
     # and reports back. Reconciling it would fight the provisioner forever.
     - group: ""
       kind: PersistentVolumeClaim
       jsonPointers:
         - /spec/volumeName
+    # Kubernetes fills in apiVersion and kind on a StatefulSet's
+    # volumeClaimTemplate. This Application syncs with ServerSideApply, so Argo CD
+    # compares a server-side apply dry-run against the live object, and the
+    # dry-run does not produce those two fields. The result is a live object with
+    # two fields the prediction lacks, and permanent OutOfSync: the sync reports
+    # Succeeded, self-heal reapplies, and the difference survives.
+    #
+    # Loki is the control that proves the cause. Its StatefulSet has the same two
+    # fields in the live object and stays Synced, because the Loki chart templates
+    # apiVersion and kind in its volumeClaimTemplate explicitly. The prometheus
+    # chart does not, and exposes no value to add them.
+    #
+    # Measured, not assumed. With ServerSideApply the comparison that decides sync
+    # status is predictedLiveState against normalizedLiveState — not target
+    # against live, which is what a manual `helm template | diff` shows and which
+    # reported zero differences here while the Application sat OutOfSync:
+    #
+    #   target    vs normalizedLive   0 differences
+    #   predicted vs normalizedLive   2 differences  <- the actual cause
+    #
+    # Verified on the cluster with root's selfHeal paused so the change survived
+    # long enough to be evaluated: novashop-prometheus reached Synced.
+    - group: apps
+      kind: StatefulSet
+      name: novashop-prometheus-alertmanager
+      jsonPointers:
+        - /spec/volumeClaimTemplates/0/apiVersion
+        - /spec/volumeClaimTemplates/0/kind
   revisionHistoryLimit: 10
