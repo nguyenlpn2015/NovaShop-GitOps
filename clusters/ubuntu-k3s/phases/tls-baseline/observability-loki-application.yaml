@@ -1,26 +1,28 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: novashop-redis-exporter
+  name: novashop-loki
   namespace: argocd
   labels:
-    app.kubernetes.io/name: redis-exporter
+    app.kubernetes.io/name: loki
     app.kubernetes.io/component: observability
     app.kubernetes.io/part-of: novashop
   annotations:
+    # Before Alloy, which pushes to it. Alloy retries, so the order is a
+    # convenience rather than a hard requirement.
     argocd.argoproj.io/sync-wave: "-13"
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: novashop-platform
   sources:
-    - repoURL: https://prometheus-community.github.io/helm-charts
-      chart: prometheus-redis-exporter
-      targetRevision: 6.28.0
+    - repoURL: https://grafana.github.io/helm-charts
+      chart: loki
+      targetRevision: 7.2.0
       helm:
-        releaseName: novashop-redis-exporter
+        releaseName: novashop-loki
         valueFiles:
-          - $values/kubernetes/observability/redis-exporter/helm-values.yaml
+          - $values/kubernetes/observability/loki/helm-values.yaml
     - repoURL: https://github.com/nguyenlpn2015/NovaShop.git
       targetRevision: 68a27fc8d21ea19cde615a34cf20687d98c3ac9b
       ref: values
@@ -45,4 +47,11 @@ spec:
         duration: 10s
         factor: 2
         maxDuration: 5m
+  ignoreDifferences:
+    # local-path writes the bound volume name back into the claim, which the
+    # chart does not template.
+    - group: ""
+      kind: PersistentVolumeClaim
+      jsonPointers:
+        - /spec/volumeName
   revisionHistoryLimit: 10

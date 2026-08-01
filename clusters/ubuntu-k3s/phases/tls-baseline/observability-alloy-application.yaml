@@ -1,26 +1,27 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: novashop-redis-exporter
+  name: novashop-alloy
   namespace: argocd
   labels:
-    app.kubernetes.io/name: redis-exporter
+    app.kubernetes.io/name: alloy
     app.kubernetes.io/component: observability
     app.kubernetes.io/part-of: novashop
   annotations:
-    argocd.argoproj.io/sync-wave: "-13"
+    # After Loki, the endpoint it writes to.
+    argocd.argoproj.io/sync-wave: "-12"
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: novashop-platform
   sources:
-    - repoURL: https://prometheus-community.github.io/helm-charts
-      chart: prometheus-redis-exporter
-      targetRevision: 6.28.0
+    - repoURL: https://grafana.github.io/helm-charts
+      chart: alloy
+      targetRevision: 1.11.0
       helm:
-        releaseName: novashop-redis-exporter
+        releaseName: novashop-alloy
         valueFiles:
-          - $values/kubernetes/observability/redis-exporter/helm-values.yaml
+          - $values/kubernetes/observability/alloy/helm-values.yaml
     - repoURL: https://github.com/nguyenlpn2015/NovaShop.git
       targetRevision: 68a27fc8d21ea19cde615a34cf20687d98c3ac9b
       ref: values

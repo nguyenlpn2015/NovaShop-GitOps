@@ -17,6 +17,8 @@ resources:
   - observability-grafana-application.yaml
   - observability-postgres-exporter-application.yaml
   - observability-redis-exporter-application.yaml
+  - observability-loki-application.yaml
+  - observability-alloy-application.yaml
 patches:
   - target:
       group: argoproj.io

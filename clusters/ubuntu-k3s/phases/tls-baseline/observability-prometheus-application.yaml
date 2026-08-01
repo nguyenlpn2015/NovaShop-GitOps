@@ -24,10 +24,10 @@ spec:
         valueFiles:
           - $values/kubernetes/observability/prometheus/helm-values.yaml
     - repoURL: https://github.com/nguyenlpn2015/NovaShop.git
-      targetRevision: 633c2c41164dec89284b29706cf8c4d0f02de0cb
+      targetRevision: 68a27fc8d21ea19cde615a34cf20687d98c3ac9b
       ref: values
     - repoURL: https://github.com/nguyenlpn2015/NovaShop.git
-      targetRevision: 633c2c41164dec89284b29706cf8c4d0f02de0cb
+      targetRevision: 68a27fc8d21ea19cde615a34cf20687d98c3ac9b
       path: kubernetes/observability
       directory:
         recurse: false
