@@ -22,7 +22,7 @@ patches:
         path: /spec/template/spec/sources/-
         value:
           repoURL: https://github.com/nguyenlpn2015/NovaShop.git
-          targetRevision: 27893ba9e9744af9097fe499fca18c9a43b4dbdf
+          targetRevision: 11e58345919ff9a273eb17cf3dbb104c3f223592
           path: kubernetes/ingress/http
           directory:
             recurse: false
