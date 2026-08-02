@@ -24,7 +24,7 @@ spec:
         valueFiles:
           - $values/kubernetes/observability/loki/helm-values.yaml
     - repoURL: https://github.com/nguyenlpn2015/NovaShop.git
-      targetRevision: e4c901f3948d2e156e1b21b55b310684932724a0
+      targetRevision: 27893ba9e9744af9097fe499fca18c9a43b4dbdf
       ref: values
   destination:
     server: https://kubernetes.default.svc

@@ -12,7 +12,7 @@ secrets:
 backend:
   replicaCount: 1
   image:
-    tag: "e4c901f3948d2e156e1b21b55b310684932724a0"
+    tag: "27893ba9e9744af9097fe499fca18c9a43b4dbdf"
   resources:
     requests:
       cpu: 50m
@@ -24,7 +24,7 @@ backend:
 frontend:
   replicaCount: 1
   image:
-    tag: "e4c901f3948d2e156e1b21b55b310684932724a0"
+    tag: "27893ba9e9744af9097fe499fca18c9a43b4dbdf"
   resources:
     requests:
       cpu: 50m
@@ -40,3 +40,14 @@ ingress:
     traefik.ingress.kubernetes.io/router.entrypoints: web
   tls:
     enabled: false
+
+# Default-deny ingress, staged one environment at a time.
+#
+# These policies were written and trialled, then never deployed: the chart
+# revision pinned here predated them by thirteen commits. This is the first
+# environment to actually receive them, so it is the one that finds out whether
+# the node-network rule admits kubelet probes on this cluster. If it does not,
+# every replica goes NotReady and Traefik returns 503 -- which is why staging
+# and production stay false until this environment has been observed.
+networkPolicy:
+  enabled: true

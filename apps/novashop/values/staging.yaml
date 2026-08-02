@@ -12,12 +12,12 @@ secrets:
 backend:
   replicaCount: 2
   image:
-    tag: "e4c901f3948d2e156e1b21b55b310684932724a0"
+    tag: "27893ba9e9744af9097fe499fca18c9a43b4dbdf"
 
 frontend:
   replicaCount: 2
   image:
-    tag: "e4c901f3948d2e156e1b21b55b310684932724a0"
+    tag: "27893ba9e9744af9097fe499fca18c9a43b4dbdf"
 
 ingress:
   frontendHost: staging.novashop.example.com
@@ -28,3 +28,10 @@ ingress:
   tls:
     enabled: true
     secretName: novashop-staging-tls
+
+# Default-deny ingress, staged one environment at a time.
+#
+# Held at false until development has run with these policies. Flipping this is
+# a one-line follow-up once that environment is observed healthy.
+networkPolicy:
+  enabled: false
