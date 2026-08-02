@@ -32,10 +32,10 @@ spec:
           - $values/kubernetes/observability/prometheus/helm-values.yaml
           - $values/kubernetes/observability/prometheus/alerting-values.yaml
     - repoURL: https://github.com/nguyenlpn2015/NovaShop.git
-      targetRevision: 11e58345919ff9a273eb17cf3dbb104c3f223592
+      targetRevision: 1beaaa5fdf72ec2f077e149468b41c2ed557bceb
       ref: values
     - repoURL: https://github.com/nguyenlpn2015/NovaShop.git
-      targetRevision: 11e58345919ff9a273eb17cf3dbb104c3f223592
+      targetRevision: 1beaaa5fdf72ec2f077e149468b41c2ed557bceb
       path: kubernetes/observability
       directory:
         recurse: false
