@@ -23,7 +23,7 @@ spec:
         valueFiles:
           - $values/kubernetes/observability/postgres-exporter/helm-values.yaml
     - repoURL: https://github.com/nguyenlpn2015/NovaShop.git
-      targetRevision: 1beaaa5fdf72ec2f077e149468b41c2ed557bceb
+      targetRevision: 43eba6656d037ef84a369f2c8be3dfa8e4a48979
       ref: values
   destination:
     server: https://kubernetes.default.svc
