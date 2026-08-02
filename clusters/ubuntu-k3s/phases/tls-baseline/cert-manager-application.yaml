@@ -22,10 +22,10 @@ spec:
         valueFiles:
           - $values/kubernetes/cert-manager/helm-values.yaml
     - repoURL: https://github.com/nguyenlpn2015/NovaShop.git
-      targetRevision: 43eba6656d037ef84a369f2c8be3dfa8e4a48979
+      targetRevision: 3f53e7ff3093518bcbc623800ee185c03c63f39a
       ref: values
     - repoURL: https://github.com/nguyenlpn2015/NovaShop.git
-      targetRevision: 43eba6656d037ef84a369f2c8be3dfa8e4a48979
+      targetRevision: 3f53e7ff3093518bcbc623800ee185c03c63f39a
       path: kubernetes/cert-manager
       directory:
         recurse: false
