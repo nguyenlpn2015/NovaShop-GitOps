@@ -4,7 +4,6 @@ namespace:
 
 config:
   environment: production
-  nextPublicApiUrl: https://api.novashop.example.com
 
 secrets:
   existingSecret: novashop-production-secrets
@@ -12,7 +11,7 @@ secrets:
 backend:
   replicaCount: 3
   image:
-    tag: "11e58345919ff9a273eb17cf3dbb104c3f223592"
+    tag: "1beaaa5fdf72ec2f077e149468b41c2ed557bceb"
   resources:
     requests:
       cpu: 250m
@@ -24,7 +23,7 @@ backend:
 frontend:
   replicaCount: 3
   image:
-    tag: "11e58345919ff9a273eb17cf3dbb104c3f223592"
+    tag: "1beaaa5fdf72ec2f077e149468b41c2ed557bceb"
   resources:
     requests:
       cpu: 200m

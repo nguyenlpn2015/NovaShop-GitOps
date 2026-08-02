@@ -4,7 +4,6 @@ namespace:
 
 config:
   environment: staging
-  nextPublicApiUrl: https://api.staging.novashop.example.com
 
 secrets:
   existingSecret: novashop-staging-secrets
@@ -12,12 +11,12 @@ secrets:
 backend:
   replicaCount: 2
   image:
-    tag: "11e58345919ff9a273eb17cf3dbb104c3f223592"
+    tag: "1beaaa5fdf72ec2f077e149468b41c2ed557bceb"
 
 frontend:
   replicaCount: 2
   image:
-    tag: "11e58345919ff9a273eb17cf3dbb104c3f223592"
+    tag: "1beaaa5fdf72ec2f077e149468b41c2ed557bceb"
 
 ingress:
   frontendHost: staging.novashop.example.com
