@@ -43,9 +43,12 @@ ingress:
     enabled: true
     secretName: novashop-production-tls
 
-# Default-deny ingress, staged one environment at a time.
+# Default-deny ingress.
 #
-# Held at false until development has run with these policies. Flipping this is
-# a one-line follow-up once that environment is observed healthy.
+# Enabled here after development ran with these policies and stayed healthy:
+# four policies present, both replicas Ready, the site answering 200. That run
+# is what established that nodeNetwork 10.10.1.0/24 admits kubelet probes on
+# this cluster -- the rule that, if wrong, takes every replica NotReady and
+# turns the edge into a wall of 503s.
 networkPolicy:
-  enabled: false
+  enabled: true
