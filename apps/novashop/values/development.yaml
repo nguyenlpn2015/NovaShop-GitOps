@@ -12,7 +12,7 @@ secrets:
 backend:
   replicaCount: 1
   image:
-    tag: "27893ba9e9744af9097fe499fca18c9a43b4dbdf"
+    tag: "11e58345919ff9a273eb17cf3dbb104c3f223592"
   resources:
     requests:
       cpu: 50m
@@ -24,7 +24,7 @@ backend:
 frontend:
   replicaCount: 1
   image:
-    tag: "27893ba9e9744af9097fe499fca18c9a43b4dbdf"
+    tag: "11e58345919ff9a273eb17cf3dbb104c3f223592"
   resources:
     requests:
       cpu: 50m
@@ -50,4 +50,13 @@ ingress:
 # every replica goes NotReady and Traefik returns 503 -- which is why staging
 # and production stay false until this environment has been observed.
 networkPolicy:
+  enabled: true
+
+# Schema migration and demo data, run as an Argo CD PreSync hook.
+#
+# Enabled here first. A failed PreSync blocks the sync rather than breaking what
+# is running, so the worst case in this environment is a stuck sync with the old
+# replicas still serving -- which is exactly the failure worth having somewhere
+# cheap before production.
+migrations:
   enabled: true

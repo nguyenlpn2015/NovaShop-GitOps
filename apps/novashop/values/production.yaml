@@ -12,7 +12,7 @@ secrets:
 backend:
   replicaCount: 3
   image:
-    tag: "27893ba9e9744af9097fe499fca18c9a43b4dbdf"
+    tag: "11e58345919ff9a273eb17cf3dbb104c3f223592"
   resources:
     requests:
       cpu: 250m
@@ -24,7 +24,7 @@ backend:
 frontend:
   replicaCount: 3
   image:
-    tag: "27893ba9e9744af9097fe499fca18c9a43b4dbdf"
+    tag: "11e58345919ff9a273eb17cf3dbb104c3f223592"
   resources:
     requests:
       cpu: 200m
@@ -52,3 +52,8 @@ ingress:
 # turns the edge into a wall of 503s.
 networkPolicy:
   enabled: true
+
+# Held until development has run the PreSync migration successfully. Flipping
+# this is a one-line follow-up.
+migrations:
+  enabled: false
