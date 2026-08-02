@@ -53,7 +53,14 @@ ingress:
 networkPolicy:
   enabled: true
 
-# Held until development has run the PreSync migration successfully. Flipping
-# this is a one-line follow-up.
+# Enabled after development ran the PreSync migration successfully: seven tables
+# created, 128 products seeded, the Job Complete and the Application Synced.
+#
+# That run also found the reason to stage it. The provisioning step had revoked
+# CREATE on schema public from PUBLIC to lock the metrics exporter out, and
+# PUBLIC includes every role -- so it locked out the application role Alembic
+# connects as. The Job failed with "permission denied for schema public", and
+# the Application still reported Synced and Healthy with an empty database
+# behind it. Fixed by granting CREATE back to the novashop role by name.
 migrations:
-  enabled: false
+  enabled: true
