@@ -11,7 +11,7 @@ secrets:
 backend:
   replicaCount: 1
   image:
-    tag: "a42513632a9644a1699b3fcc55c9a88e05449cb8"
+    tag: "2a0460bdf04c85c91121dc3680016cd6afedfdb5"
   resources:
     requests:
       cpu: 50m
@@ -23,7 +23,7 @@ backend:
 frontend:
   replicaCount: 1
   image:
-    tag: "a42513632a9644a1699b3fcc55c9a88e05449cb8"
+    tag: "2a0460bdf04c85c91121dc3680016cd6afedfdb5"
   resources:
     requests:
       cpu: 50m
